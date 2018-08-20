@@ -1,6 +1,6 @@
 // Environment configuration
 if (process.env.NODE_ENV === 'production') {
-  window.endpoint = 'https://stickly.herokuapp.com'
+  window.endpoint = 'https://shopty.herokuapp.com'
  } else {
   window.endpoint = 'http://localhost:3000'
  }
