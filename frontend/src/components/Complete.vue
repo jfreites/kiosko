@@ -6,9 +6,10 @@
 		<p>Congratulations! Your order for <strong>Seven Stars Clothing &reg;</strong> will be shipped out within 2-5 business days. <a href='#'>support@sevenstarsclothing.com</a>. We sent you a confirmation email for your records. Thanks so much!</p>
 
 		<div v-if='orderDetails'>
+			<hr>
 			<dl>
 				<dt>Order Number</dt>
-				<dd>{{ orderDetails.transactions[0].custom }} / {{ orderDetails.id }}</dd>
+				<dd>{{ orderDetails.transactions[0].custom }} ({{ orderDetails.id }})</dd>
 				<dt>Order Created</dt>
 				<dd>{{ orderDetails.create_time | moment }}</dd>
 				<dt>Payment Amount</dt>
@@ -19,10 +20,15 @@
                     {{ orderDetails.transactions[0].item_list.shipping_address.city }} {{ orderDetails.transactions[0].item_list.shipping_address.country_code }},
                     {{ orderDetails.transactions[0].item_list.shipping_address.postal_code }} {{ orderDetails.transactions[0].item_list.shipping_address.state }}
                 </dd>
-                <dt>Engraving Text</dt>
+                <dt>Transaction description</dt>
 				<dd>{{ orderDetails.transactions[0].description }}</dd>
 				<dt>Email</dt>
 				<dd>{{ orderDetails.transactions[0].payee.email }}</dd>
+			</dl>
+			<hr>
+			<dl>
+				<dt>Notes to payer</dt>
+				<dd>{{ orderDetails.note_to_payer }}</dd>
 			</dl>
 		</div>
 	</div>

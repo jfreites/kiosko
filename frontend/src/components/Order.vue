@@ -25,50 +25,7 @@
                 </div>
 
                 <hr id='left-line'>
-                                
-                <div class="field">
-                    <label for="card_number">Card Number</label>
-                    <input id="card_number" v-model="card.number" type="text" :class="['is-danger' ? cardNumberError : '', 'input']" placeholder='4242424242424242'>
-                    <span class="help is-danger" v-show="cardNumberError">
-                        {{ cardNumberError }}
-                    </span>
-                </div>
 
-                <div class="field">
-                    <label for="cvc">CVC</label>
-                    <input id="cvc" v-model="card.cvc" type="text" class="input" placeholder='123'>
-                    <span class="help is-danger" v-show="cardCvcError">
-                        {{ cardCvcError }}
-                    </span>
-                </div>
-
-                <div class="field">
-                    <label for="exp_month">Expiry Month</label>
-                    
-                    <input id="exp_month" v-model="card.exp_month" type="text" :class="['is-danger' ? cardMonthError : '', 'input']" placeholder="MM">
-                    <span class="help is-danger" v-show="cardMonthError">
-                        {{ cardMonthError }}
-                    </span>
-                </div>
-
-                <div class="field">
-                    <label for="exp_month">Expiry Year</label>
-                    <input id="exp_year" v-model="card.exp_year" type="text" :class="['is-danger' ? cardYearError : '', 'input']" placeholder="YY">
-                    <span class="help is-danger" v-show="cardYearError">
-                        {{ cardYearError }}
-                    </span>
-                </div>
-                    
-                <div class="help is-danger" v-if="cardCheckError">
-                    <span>{{ cardCheckErrorMessage }}</span>
-                </div> 
-            </div>
-            <div class='column is-4'>         
-                <label>Special Note</label>
-                <textarea class="textarea" placeholder="What would you like the note to say?" v-model='engravingText'></textarea>
-                
-                <hr>
-                
                 <div class="field">
                     <label>Address</label>
                     <input type='text' class='input' v-model='address.street' placeholder='123 Fake St #303'>
@@ -77,8 +34,16 @@
                     <label>City</label>
                     <input type='text' class='input' v-model='address.city' placeholder='San Francisco'>
                 </div>
+                                
+            </div>
+            <div class='column is-4'>         
+                <label>Instructions</label>
+                <textarea class="textarea" placeholder="What would you like the note to say?" v-model='engravingText'></textarea>
+                
+                <hr>
+                
                 <div class="field">
-                <label>State</label>
+                    <label>State</label>
                     <input type='text' class='input' v-model='address.state' placeholder='CA'>
                 </div>
                 <div class="field">
@@ -89,8 +54,8 @@
         </div>
         <div class="columns">
             <div class='column is-12'>
-                <button type="submit" class="button is-primary is-large is-pulled-right" @click="validate" :disabled="cardCheckSending">
-                    <span v-if="cardCheckSending">
+                <button type="submit" class="button is-primary is-large is-pulled-right" @click="validate" :disabled="paymentCheckSending">
+                    <span v-if="paymentCheckSending">
                         <i class="fa fa-btn fa-spinner fa-spin"></i> 
                         Ordering...
                     </span>
@@ -110,9 +75,9 @@ export default {
     data(){
         return {
             // fields
-            name: 'Connor Leech',
-            email: 'connor@employbl.com',
-            engravingText: 'This is the text to put on the bundle of sticks',
+            name: 'Jon Doe',
+            email: 'jondoe@emailfake.com',
+            engravingText: 'Additional instructions for my order',
             address: {
                 street: '123 Something Lane',
                 city: 'San Francisco',
@@ -120,35 +85,20 @@ export default {
                 zip: '94607'
             },
 
-            card: {
-                number: '4242424242424242',
-                cvc: '123',
-                exp_month: '01',
-                exp_year: '19'
-            },
-
             // validation
-            cardNumberError: null,
-            cardCvcError: null,
-            cardMonthError: null,
-            cardYearError: null,
-            cardCheckSending: false,
-            cardCheckError: false,
-            cardCheckErrorMessage: ''
+            paymentCheckSending: false,
+            paypalCheckError: false,
+            paypalErrorMessage: ''
         }
     },
     methods: {
-        validate(){
-            this.clearCardErrors();
+        validate() {
+            // Some validations here....
             let valid = true;
-            if(!this.card.number){ valid = false; this.cardNumberError = "Card Number is Required"; }
-            if(!this.card.cvc){ valid = false; this.cardCvcError = "CVC is Required"; }
-            if(!this.card.exp_month){ valid = false; this.cardMonthError = "Month is Required"; }
-            if(!this.card.exp_year){ valid = false; this.cardYearError = "Year is Required"; }
-            if(valid){
-                //this.createToken();
+
+            if (valid) {
                 // **********************
-                // Make the call directly
+                this.paymentCheckSending = true;
                 // BEGIN ->
                 var request = {
                     name: this.name,
@@ -169,57 +119,7 @@ export default {
                             this.$router.push({ path: `order-complete/${charge.id}` })
                         }
                     });
-                
-                // <- END
                 // ***********************
-            }
-        },
-        clearCardErrors(){
-            this.cardNumberError = null;
-            this.cardCvcError = null;
-            this.cardMonthError = null;
-            this.cardYearError = null;
-        },
-        createToken() {
-            this.cardCheckError = false;
-            //window.Stripe.setPublishableKey(this.stripeKey);
-            //window.Stripe.createToken(this.card, $.proxy(this.stripeResponseHandler, this));
-            this.cardCheckSending = true;
-        },
-        stripeResponseHandler(status, response) {
-            this.cardCheckSending = false;
-            if (response.error) {
-                this.cardCheckErrorMessage = response.error.message;
-                this.cardCheckError = true;
-
-                console.error(response.error);
-            } else {
-                // this.tokenRetrieved = true;
-                // this.$emit('paymentEntered', response.id);
-
-                // token to create a charge on our server 
-                var token_from_stripe = response.id;
-
-                var request = {
-                    name: this.name,
-                    email: this.email,
-                    engravingText: this.engravingText,
-                    address: this.address,
-                    card: this.card,
-                    token_from_stripe: token_from_stripe
-                };
-
-                // Send to our server
-                axios.post(`${window.endpoint}/charge`, request)
-                    .then((res) => {
-                        var error = res.data.error;
-                        var charge = res.data.charge;
-                        if (error){
-                            console.error(error);
-                        } else {
-                            this.$router.push({ path: `order-complete/${charge.id}` })
-                        }
-                    });
             }
         }
     }
